@@ -1,8 +1,6 @@
 // ignore_for_file: avoid_unnecessary_containers
 
 import 'dart:convert';
-import 'dart:js_interop';
-// import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:file_picker/file_picker.dart';
@@ -18,7 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Flutter Application',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -40,6 +38,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   String result = "insert an image";
   var imgbytes = null;
+  bool _isloading = false;
   Future<void> _sendImage() async {
     try {
       final pickedFile = await FilePicker.platform.pickFiles();
@@ -47,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var a = filepath!.bytes;
 
       String base64Image = base64Encode(a!);
-      var url = Uri.parse('http://127.0.0.1:5000');
+      var url = Uri.parse('https://brain-clf-tumor-model.onrender.com');
       var response = await http.post(url,
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
@@ -67,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         result = res;
         imgbytes = a;
+        _isloading = false;
       });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Image Picker Example"),
+          title: const Text("Brain Tumor classifier"),
         ),
         body: Center(
           child: Column(
@@ -96,10 +96,18 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               MaterialButton(
                   color: Colors.blue,
-                  child: const Text("Pick Image from Camera",
-                      style: TextStyle(
-                          color: Colors.white70, fontWeight: FontWeight.bold)),
-                  onPressed: () => _sendImage()),
+                  child: _isloading
+                      ? const CircularProgressIndicator()
+                      : const Text("Pick Image from Camera",
+                          style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold)),
+                  onPressed: () {
+                    setState(() {
+                      _isloading = true;
+                    });
+                    _sendImage();
+                  }),
             ],
           ),
         ));
