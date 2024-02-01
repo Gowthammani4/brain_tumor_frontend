@@ -98,7 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Colors.blue,
                   child: _isloading
                       ? const CircularProgressIndicator()
-                      : const Text("Pick Image from Camera",
+                      : const Text("Pick Image",
                           style: TextStyle(
                               color: Colors.white70,
                               fontWeight: FontWeight.bold)),
